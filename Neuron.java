@@ -14,9 +14,9 @@ class Neuron {
 			x < size;
 			x++
 		) {
-			this.weights[x] = 0.5;
+			this.weights[x] = (Math.random() - 0.5) * 2;
 		}
-		this.bias = 0.0;
+		this.bias = (Math.random() - 0.5) * 2;
 		this.alu = alu;
 	}
 	

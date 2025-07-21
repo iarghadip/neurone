@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class NeuralNetwork {
 
     private Layer[] layers;
@@ -21,7 +23,7 @@ public class NeuralNetwork {
         for (Layer layer : layers) {
             output = layer.activate(output);
         }
-        return output;
+        return softmax(output);
     }
 
     public void train(
@@ -43,4 +45,19 @@ public class NeuralNetwork {
             learningRate
         );
     }
+
+    public double[] softmax(double[] x) {
+        double max = Arrays.stream(x).max().orElse(0);
+        double sum = 0;
+        double[] result = new double[x.length];
+        for (int i = 0; i < x.length; i++) {
+            result[i] = Math.exp(x[i] - max); // prevent overflow
+            sum += result[i];
+        }
+        for (int i = 0; i < result.length; i++) {
+            result[i] /= sum;
+        }
+        return result;
+    }
+
 }
