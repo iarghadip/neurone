@@ -1,64 +1,65 @@
+import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileReader;
+
 public class Main {
-    
-    public static void result(
-        Layer layer,
-        double[] input
-    ) {
-        double[] output = layer.activate(input);
-        if (output[0] >= 0.5 && output[1] <= 0.5) {
-            System.out.println("Cat");
-        } else if (output[1] >= 0.5 && output[0] <= 0.5) {
-            System.out.println("Dog");
-        } else {
-            System.out.println("Uncertain");
-        }
-    }
-    
-    public static void main(
-        String[] args
-    ) {
-
-        Rosetta rosetta = new Rosetta();
-
-        double[] vector = rosetta.vectorize("Hello my name is Arghadip, I am Arghadip and currently working on a NN project. Wish me luck!");
-
-        for (double x : vector) {
-            System.out.println(x);
-        }
-        
-        double[] cat = {1.0, 0.0};
-        double[] dog = {0.0, 1.0};
-        
-        double[][] inputs = {
-            cat,
-            dog
-        };
-        
-        double[][] targets = {
-            cat,
-            dog
-        };
-
+    public static void main(String[] args) {
+        Vocabulary vocabulary = new Vocabulary();
         ALU alu = new ALU();
-        Layer inputLayer = new Layer(
-            inputs.length,
-            inputs.length,
+        Category category = new Category();
+        Scanner scanner = new Scanner(System.in);
+
+        int inputSize = vocabulary.size(); // Fixed input vector size (word limit)
+        int hiddenSize = inputSize * 2;
+        int outputSize = category.getCategoryCount();
+
+        NeuralNetwork neuralNetwork = new NeuralNetwork(
+            new int[]{inputSize, hiddenSize, outputSize},
             alu
         );
 
-        // single layer, no hidden layer, no output layer
+        // ------ Training Phase ------
+        System.out.println("Training from database/training.csv...");
 
-        for (int epoch = 0; epoch < 1000; epoch++) {
-            for (int i = 0; i < inputs.length; i++) {
-                inputLayer.train(inputs[i], targets[i], 0.1);
+        try (BufferedReader br = new BufferedReader(new FileReader("database/training.csv"))) {
+            br.readLine(); // Skip header
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",", 2);
+                if (parts.length != 2) continue;
+
+                String label  = parts[0].trim();
+                String sentence = parts[1].trim();
+
+                double[] inputVector = vocabulary.vectorize(sentence);
+                try {
+                    double[] targetVector = category.targetHotVector(label);
+                    for (int epoch = 0; epoch < 100; epoch++) {
+                        neuralNetwork.train(inputVector, targetVector, 0.1);
+                    }
+                } catch (IllegalArgumentException e) {
+                    System.err.println("⚠ Skipping unknown category: " + label);
+                }
             }
+        } catch (Exception e) {
+            System.err.println("❌ Failed to train from CSV: " + e.getMessage());
         }
-        
-        result(inputLayer, cat);
-        result(inputLayer, dog);
-        result(inputLayer, new double[]{1.0, 1.0});
-        result(inputLayer, new double[]{0.0, 0.0});
-    }
-    
-}
 
+        // ------ Prediction Phase ------
+        System.out.println("\nTraining complete ✅");
+        System.out.println("Type a sentence to predict the category (type 'exit' to quit):");
+
+        while (true) {
+            String input = scanner.nextLine().trim();
+            if (input.equalsIgnoreCase("exit")) break;
+
+            double[] vector = vocabulary.vectorize(input);
+            double[] output = neuralNetwork.predict(vector);
+            String predictedLabel = category.getLabelFromVector(output);
+
+            System.out.println("Prediction: " + predictedLabel);
+        }
+
+        scanner.close();
+    }
+}

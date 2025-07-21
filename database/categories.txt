@@ -1,0 +1,12 @@
+Grocery
+Food & Drink
+Transport
+Recurring
+Business
+Entertainment
+Shopping
+Gift & Donation
+Education
+Medical
+Services
+Individual
