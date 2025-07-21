@@ -38,9 +38,10 @@ class Neuron {
 		double z = this.alu.pdot(
 			this.weights, inputs
 		) + this.bias;
+		double a = this.alu.sigmoid(z);
 		double gradient = (
-			this.alu.sigmoid(z) - target
-		) * this.alu.dsigmoid(z);
+			a - target
+		) * this.alu.dsigmoid(a);
 		for (
 			int i = 0;
 			i < this.weights.length;

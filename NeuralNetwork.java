@@ -4,13 +4,13 @@ public class NeuralNetwork {
     private ALU alu;
 
     NeuralNetwork(
-        int[] strcuture,
+        int[] structure,
         ALU alu
     ) {
         this.alu = alu;
-        this.layers = new Layer[strcuture.length - 1];
-        for (int i = 0; i < strcuture.length - 1; i++) {
-            this.layers[i] = new Layer(strcuture[i], strcuture[i + 1], alu);
+        this.layers = new Layer[structure.length - 1];
+        for (int i = 0; i < structure.length - 1; i++) {
+            this.layers[i] = new Layer(structure[i], structure[i + 1], alu);
         }
     }
 
@@ -31,14 +31,16 @@ public class NeuralNetwork {
     ) {
         double[][] activations = new double[layers.length + 1][];
         activations[0] = input;
+
         for (int i = 0; i < layers.length; i++) {
             activations[i + 1] = layers[i].activate(activations[i]);
         }
-        double[] errors = new double[target.length];
-        for (int i = 0; i < target.length; i++) {
-            errors[i] = target[i];
-        }
-        layers[layers.length - 1].train(activations[activations.length - 2], target, learningRate);
-    }
 
+        // Only trains the last layer — no backpropagation
+        layers[layers.length - 1].train(
+            activations[activations.length - 2],
+            target,
+            learningRate
+        );
+    }
 }

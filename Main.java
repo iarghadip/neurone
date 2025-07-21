@@ -1,6 +1,7 @@
-import java.util.Scanner;
+import java.util.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.concurrent.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -21,6 +22,11 @@ public class Main {
         // ------ Training Phase ------
         System.out.println("Training from database/training.csv...");
 
+        ExecutorService executor = Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors() * 10
+        );
+        List<Future<?>> futures = new ArrayList<>();
+
         try (BufferedReader br = new BufferedReader(new FileReader("database/training.csv"))) {
             br.readLine(); // Skip header
             String line;
@@ -30,17 +36,33 @@ public class Main {
 
                 String label  = parts[0].trim();
                 String sentence = parts[1].trim();
-
                 double[] inputVector = vocabulary.vectorize(sentence);
+
                 try {
                     double[] targetVector = category.targetHotVector(label);
-                    for (int epoch = 0; epoch < 100; epoch++) {
-                        neuralNetwork.train(inputVector, targetVector, 0.1);
-                    }
+
+                    Runnable task = () -> {
+                        System.out.println("Training: " + sentence + "...");
+                        for (int epoch = 0; epoch < 10; epoch++) {
+                            synchronized (neuralNetwork) {
+                                neuralNetwork.train(inputVector, targetVector, 0.1);
+                            }
+                        }
+                    };
+                    futures.add(executor.submit(task));
+
                 } catch (IllegalArgumentException e) {
                     System.err.println("⚠ Skipping unknown category: " + label);
                 }
             }
+
+            // Wait for all tasks to complete
+            for (Future<?> future : futures) {
+                future.get(); // Will block until this training task is done
+            }
+
+            executor.shutdown();
+
         } catch (Exception e) {
             System.err.println("❌ Failed to train from CSV: " + e.getMessage());
         }

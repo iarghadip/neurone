@@ -8,7 +8,6 @@ class ALU {
 		for (
 			result = 1;
 			exponent > 0;
-			base *= base,
 			exponent >>= 1
 		) {
 			if (
@@ -16,6 +15,7 @@ class ALU {
 			) {
 				result *= base;
 			}
+			base *= base;
 		}
 		return result;
 	}
@@ -23,18 +23,18 @@ class ALU {
 	public double factorial(
 		double number
 	) {
-		if (number >= 0) {
-			double result = 1;
-			for (
-				int x = 2;
-				x <= number;
-				x++
-			) {
-				result *= x;
-			}
-			return result;
+		if (number < 0 || number != (int) number) {
+			return -1;
 		}
-		return -1;
+		double result = 1;
+		for (
+			int x = 2;
+			x <= (int) number;
+			x++
+		) {
+			result *= x;
+		}
+		return result;
 	}
 	
 	public double exponential(
@@ -48,7 +48,7 @@ class ALU {
 		) {
 			result += power(
 				number, x
-			) / factorial(x);
+			) / factorial((double) x);
 		}
 		return result;
 	}
@@ -109,13 +109,6 @@ class ALU {
 			result += numbers[x++];
 		}
 		return result;
-	}
-	
-	public int sum2(
-		int a,
-		int b
-	) {
-		return a + b;
 	}
 	
 	public boolean odd(

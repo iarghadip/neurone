@@ -27,7 +27,9 @@ public class Vocabulary {
                 String label  = parts[0].trim();
                 String sentence = parts[1].trim();
 
-                memorize(sentence, false);
+                for (String token : tokenize(sentence)) {
+                    memorize(token, false);
+                }
             }
         } catch (Exception e) {
             System.err.println("❌ Failed to train from CSV: " + e.getMessage());
@@ -74,20 +76,15 @@ public class Vocabulary {
         return tokens.toArray(new String[0]);
     }
 
-    public double[] vectorize(
-        String sentence
-    ) {
+    public double[] vectorize(String sentence) {
         String[] tokens = tokenize(sentence);
-        for (String token : tokens) {
-            if (!vocabulary.containsKey(token)) {
-                memorize(token, true);
-            }
-        }
         int size = vocabulary.size();
         List<Double> vector = new ArrayList<>(Collections.nCopies(size, 0.0));
         for (String token : tokens) {
-            int index = vocabulary.get(token);
-            vector.set(index, vector.get(index) + 1.0);
+            Integer index = vocabulary.get(token);
+            if (index != null) {
+                vector.set(index, 1.0); // Binary presence instead of count
+            }
         }
         return vector.stream().mapToDouble(Double::doubleValue).toArray();
     }

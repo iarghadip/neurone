@@ -42,6 +42,15 @@ class Layer {
 		double[] targets,
 		double rate
 	) {
+		if (
+			targets == null ||
+			targets.length != this.neurons.length
+		) {
+			throw new IllegalArgumentException(
+				"Target size mismatch with neuron count"
+			);
+		}
+		
 		for (
 			int x = 0;
 			x < this.neurons.length;
