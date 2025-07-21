@@ -17,6 +17,14 @@ public class Main {
     public static void main(
         String[] args
     ) {
+
+        Rosetta rosetta = new Rosetta();
+
+        double[] vector = rosetta.vectorize("Hello my name is Arghadip, I am Arghadip and currently working on a NN project. Wish me luck!");
+
+        for (double x : vector) {
+            System.out.println(x);
+        }
         
         double[] cat = {1.0, 0.0};
         double[] dog = {0.0, 1.0};
