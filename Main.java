@@ -10,8 +10,8 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         int inputSize = vocabulary.size(); // Fixed input vector size (word limit)
-        int hiddenSize = inputSize * 2;
         int outputSize = category.getCategoryCount();
+        int hiddenSize = inputSize * outputSize;
 
         NeuralNetwork neuralNetwork = new NeuralNetwork(
             new int[]{inputSize, hiddenSize, outputSize},

@@ -43,12 +43,12 @@ public class Vocabulary {
             vocabulary.put(token, vocabIndex++);
             if (save && false) {
                 
-                try (BufferedWriter bw = new BufferedWriter(new FileWriter("database/learned.txt", true))) {
-                    bw.write(token);
-                    bw.newLine();
-                } catch (IOException e) {
-                    System.err.println("Error saving vocabulary to file: " + e.getMessage());
-                }
+                // try (BufferedWriter bw = new BufferedWriter(new FileWriter("database/learned.txt", true))) {
+                //     bw.write(token);
+                //     bw.newLine();
+                // } catch (IOException e) {
+                //     System.err.println("Error saving vocabulary to file: " + e.getMessage());
+                // }
             }
         }
     }
