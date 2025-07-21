@@ -14,10 +14,6 @@ public class Rosetta {
     private int vocabIndex = 0;
 
     Rosetta() {
-        memorize(read());
-    }
-
-    public List<String[]> read() {
         List<String[]> rows = new ArrayList<>();
         File dir = new File("Database");
         File[] files = dir.listFiles((d, name) -> name.toLowerCase().endsWith(".csv"));
@@ -34,7 +30,7 @@ public class Rosetta {
                 }
             }
         }
-        return rows;
+        memorize(rows);
     }
 
     public void memorize(
